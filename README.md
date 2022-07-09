@@ -15,5 +15,7 @@ For the application to work, link it to directus CMS or modify it to work with a
 Edit the `.env` file
 Should you feel stuck, get in touch and I will help you out.
 
+You can visit https://uzzieltech.co.ke/contact
+
 This project can be viewed here
 https://doktarie.com
