@@ -1,0 +1,137 @@
+---
+import {Directus} from "@directus/sdk"
+import Layout from "@layouts/layout.astro"
+import DTitle from "@components/DTitle.vue"
+import ProductSearch from "@components/ProductSearch.vue"
+import Products from "@components/Products.vue"
+import Whatsapp from "@components/Whatsapp.vue"
+
+// src/pages/equipment/for-hire/category/[category].astro
+export async function getStaticPaths() {
+  const data_url = import.meta.env.PUBLIC_CMS
+  
+  const directus = new Directus(data_url)
+
+  const equipment_data = await directus.items('equipment_category').readByQuery({
+    filter:{
+			"_and":[
+				{
+					"status":{
+						"_eq":"published"
+					}
+				},
+				{
+					"type":{
+						"_contains": 'hire'
+					}
+				}
+			]
+		},
+		fields:['slug'],
+		limit:-1
+  }).catch()
+
+  const equipment = equipment_data.data
+
+  let store = []
+
+  equipment.map((item) => {
+    let data = {}
+    data.params = {}
+    data.params.category = item.slug
+    store.push(data)
+  })
+  
+  return store
+}
+
+const url = import.meta.env.PUBLIC_CMS
+
+const directus = new Directus(url)
+
+const {category} = Astro.params
+
+const store_category = await directus.items('equipment_category').readByQuery({
+	filter:{
+		"_and":[
+			{
+				"status":{
+					"_eq":"published"
+				}
+			},
+			{
+				"type":{
+					"_contains":"hire"
+				}
+			}
+		]
+	},
+	limit:30,
+	sort:"name"
+})
+
+const store_product = await directus.items('equipment').readByQuery({
+	filter:{
+		"_and":[
+			{
+				"status":{
+					"_eq":"published"
+				}
+			},
+			{
+				"category":{
+					"slug":{
+						"_eq": category
+					}
+				}
+			},
+			{
+				"category":{
+					"type":{
+						"_contains": 'hire'
+					}
+				}
+			},
+			{
+				"type":{
+					"_contains":"hire"
+				}
+			}
+		]
+	},
+	fields:['name,slug,images.directus_files_id,category.name'],
+	limit:30,
+	sort:"-date_created"
+})
+
+const categories = store_category.data
+const products = store_product.data
+---
+
+<Layout title="Medical equipment for hire" description="Find medical equipment for hire in Nairobi at affordable prices. Our products are of the highest quality.">
+	<div class="container mx-auto px-2 py-4 mt-16">
+		
+		<DTitle text="Equipment for hire" />
+  	
+  	<h2 class="text-2xl text-stone-800 dark:text-white capitalize font-semibold text-center mt-2 mb-6">
+      {products[0] ? products[0].category.name : ''}
+    </h2>
+
+    <ProductSearch 
+      client:load 
+      url={url}
+      type='hire'
+    />
+
+  	<Products 
+    	type="hire"
+    	categories={categories}
+    	products={products}
+    	url={url}
+    />
+
+  </div>
+
+  <Whatsapp client:load />
+
+</Layout>

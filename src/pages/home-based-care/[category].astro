@@ -1,0 +1,99 @@
+---
+import {Directus} from "@directus/sdk"
+import Layout from "@layouts/layout.astro"
+import Intro from "@components/Intro.vue"
+import Cta from "@components/Cta.astro"
+import Whatsapp from "@components/Whatsapp.vue"
+
+// src/pages/home-based-care/[category].astro
+export async function getStaticPaths() {
+  const data_url = import.meta.env.PUBLIC_CMS
+  const directus = new Directus(data_url)
+  const category_data = await directus.items('home_based_care_categories').readByQuery({
+    filter:{
+      "_and":[
+        {
+          "status":{
+            "_eq":"published"
+          }
+        }
+      ]
+    },
+    limit:-1,
+    fields:["slug"]
+  }).catch()
+
+  const category = category_data.data
+
+  let store = []
+
+  category.map((item) => {
+    let data = {}
+    data.params = {}
+    data.params.category = item.slug
+    store.push(data)
+  })
+  
+  return store
+}
+
+const {category} = Astro.params
+const directus = new Directus(import.meta.env.PUBLIC_CMS)
+
+const service_data = await directus.items('home_based_care_services').readByQuery({
+  filter:{
+    "_and":[
+      {
+        "status":{
+          "_eq":"published"
+        }
+      },
+      {
+        "service_category":{
+          "slug":{
+            "_eq": category
+          }
+        }
+      }
+    ]
+  },
+  fields:['name,service_category.category_name,service_category.seo_description,service_category.caegory_banner,service_category.category_description']
+})
+
+const services = service_data.data
+---
+<Layout title={services[0].service_category.category_name} description={services[0].service_category.seo_description}>
+	<Intro 
+  	background={`${import.meta.env.PUBLIC_CMS}assets/${services[0].service_category.caegory_banner}`}
+  	title={`${services[0].service_category.category_name}`}
+		description={`${services[0].service_category.category_description}`}
+  />
+  <section>
+    <div class="container max-w-5xl px-4 py-12 mx-auto">
+      <div class="grid gap-4 mx-4 sm:grid-cols-12">
+        <div class="col-span-12 sm:col-span-3">
+          <div class="text-center sm:text-left mb-14 before:block before:w-24 before:h-3 before:mb-5 before:rounded-md before:mx-auto sm:before:mx-0 before:bg-doktarie-blue">
+            <h3 class="text-3xl font-semibold">
+              Services Offered
+            </h3>
+          </div>
+        </div>
+        <div class="relative col-span-12 px-4 space-y-6 sm:col-span-9">
+          <div class="col-span-12 space-y-12 relative sm:px-4 sm:col-span-8 sm:space-y-8 sm:before:absolute sm:before:top-2 sm:before:bottom-0 sm:before:w-0.5 sm:before:-left-3 before:dark:bg-coolGray-700">
+            {
+              services.map((service) => (
+                <div class="flex flex-col relative before:absolute before:top-2 before:w-4 before:h-4 before:rounded-full before:left-[-35px] before:z-[1] before:bg-doktarie-blue">
+                  <p class="text-lg tracking-wide">
+                    {service.name}
+                  </p>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <Cta />
+	<Whatsapp client:load />
+</Layout>

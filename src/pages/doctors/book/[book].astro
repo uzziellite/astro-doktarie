@@ -1,0 +1,125 @@
+---
+import {Directus} from "@directus/sdk"
+import Layout from "@layouts/layout.astro"
+import DTitle from "@components/DTitle.vue"
+import Subtitle from "@components/Subtitle.vue"
+import Whatsapp from "@components/Whatsapp.vue"
+import BookSpecialist from "@components/BookSpecialist.vue"
+
+// src/pages/doctors/book/[book].astro
+export async function getStaticPaths() {
+  const data_url = import.meta.env.PUBLIC_CMS
+  const directus = new Directus(data_url)
+  const specialist_data = await directus.items('doctors').readByQuery({
+    filter:{
+      "_and":[
+        {
+          "status":{
+            "_eq":"published"
+          }
+        }
+      ]
+    },
+    limit:-1,
+    fields:["slug"]
+  }).catch()
+
+  const specialist = specialist_data.data
+
+  let store = []
+
+  specialist.map((item) => {
+    let data = {}
+    data.params = {}
+    data.params.book = item.slug
+    store.push(data)
+  })
+  
+  return store
+}
+
+const directus = new Directus(import.meta.env.PUBLIC_CMS)
+
+const {book} = Astro.params
+
+const specialist_data = await directus.items('doctors').readByQuery({
+	filter:{
+		"_and":[
+			{
+				"status":{
+					"_eq":"published"
+				}
+			},
+			{
+				"slug":{
+					"_eq":book
+				}
+			}
+		]
+	}
+})
+
+const specialist = specialist_data.data[0]
+---
+
+<Layout title="Confirm Booking Details">
+	<section class="container mx-auto p-4 mt-16 mb-6">
+    <DTitle text="Confirm Booking" />
+    <Subtitle text={`${specialist.details[0].description}`} />
+    <div class="p-1 xl:p-4 md:flex md:space-x-6 bg-stone-200 dark:bg-stone-800 shadow-md rounded-lg my-6">
+			<div class="mb-6 md:h-64 md:w-64 sm:mb-0">
+				<img src={`${import.meta.env.PUBLIC_CMS}assets/${specialist.avatar}`} alt={`specialist.details[0].name`} class="object-cover object-center w-full h-full rounded" />
+			</div>
+			<div class="flex flex-wrap flex-col space-y-4">
+				<div>
+					<h2 class="text-2xl font-semibold text-sky-600">
+						{specialist.details[0].name}
+					</h2>
+					<span class="text-lg">
+						{specialist.details[0].discipline} | {specialist.details[0].type_of_practice}
+					</span>
+				</div>
+				<div class="space-y-3">
+					<span class="flex items-center flex-wrap space-x-2">
+						<span class="font-semibold text-sky-600">Registration Number:</span>
+						<span class="text-sm">
+							{specialist.details[0].registration_number}
+						</span>
+					</span>
+					<span class="flex items-center flex-wrap space-x-2">
+						<span class="font-semibold text-sky-600">Service type:</span>
+						<span class="text-sm">
+							{specialist.details[0].service_type}
+						</span>
+					</span>
+					<span class="flex items-center flex-wrap space-x-2">
+						<span class="font-semibold text-sky-600">Provider Location:</span>
+						<span class="text-sm">
+							{specialist.details[0].provider_location}
+						</span>
+					</span>
+					<span class="flex items-center flex-wrap space-x-2">
+						<span class="font-semibold text-sky-600">Qualifications:</span>
+						<span class="text-sm">
+							{specialist.details[0].qualifications}
+						</span>
+					</span>
+					<span class="flex items-center flex-wrap space-x-2">
+						<span class="font-semibold text-sky-600">Consultation Fees: </span>
+						<span class="text-sm">
+							{specialist.details[0].fees}
+						</span>
+					</span>
+					
+					<BookSpecialist 
+						client:load
+						specialist={specialist}
+						url={import.meta.env.PUBLIC_CMS}
+					/>
+
+				</div>
+			</div>
+		</div>
+  </section>
+	<Whatsapp client:load />
+</Layout>

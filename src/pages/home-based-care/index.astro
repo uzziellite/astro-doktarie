@@ -1,0 +1,147 @@
+---
+import {Directus} from "@directus/sdk"
+import Whatsapp from "@components/Whatsapp.vue"
+import Layout from "@layouts/layout.astro"
+import Intro from "@components/Intro.vue"
+import DTitle from "@components/DTitle.vue"
+import Subtitle from "@components/Subtitle.vue"
+import Cta from "@components/Cta.astro"
+
+const directus = new Directus(import.meta.env.PUBLIC_CMS)
+
+const intro_data = await directus.items('home_based_care_intro').readByQuery({
+  filter:{
+    "_and":[
+      {
+        "status":{
+          "_eq":"published"
+        }
+      }
+    ]
+  }
+}).catch()
+
+const intro = intro_data.data
+
+const services_data = await directus.items('home_based_care_services').readByQuery({
+  filter:{
+    "_and":[
+      {
+        "status":{
+          "_eq":"published"
+        }
+      }
+    ]
+  },
+  fields:['name,service_category.category_name,service_category.seo_description,service_category.category_description,service_category.category_banner'],
+  limit:-1
+}).catch()
+
+const services = services_data.data
+
+const timeline_data = await directus.items('service_timelines').readByQuery({
+  filter:{
+    "_and":[
+      {
+        "status":{
+          "_eq":"published"
+        }
+      }
+    ]
+  }
+}).catch()
+
+const timelines = timeline_data.data
+
+const category_data = await directus.items('home_based_care_categories').readByQuery({
+  filter:{
+    "_and":[
+      {
+        "status":{
+          "_eq":"published"
+        }
+      }
+    ]
+  },
+  fields:["category_name,slug,caegory_banner.*"]
+}).catch()
+
+const categories = category_data.data
+---
+
+<Layout title="Home based care" description="Doktarie offers the best home based care in Nairobi to enable you to get the best care at home">
+  <Intro 
+  	background={`${import.meta.env.PUBLIC_CMS}assets/2bc98ff8-b0c2-4c80-8c08-5e0643001d91`}
+  	title="Home Based Care"
+		description="We provide home based care services to all our clients. Our specialists come to your home so you do not have to go to a hospital"
+  />
+  <div class="container mx-auto my-4">
+    <section class="p-4 lg:p-8">
+      <div class="container mx-auto space-y-12">
+        <div class="bg-white dark:bg-stone-800 flex flex-col overflow-hidden rounded-md shadow-md xl:flex-row">
+          <img src={`${import.meta.env.PUBLIC_CMS}assets/9d77dacc-c277-46b8-b896-029b38137b46`} alt="" class="aspect-video">
+          <div class="flex flex-col justify-center flex-1 p-2 sm:p-6">
+            <h3 class="text-3xl font-bold">
+              What is home based care
+            </h3>
+            <p class="my-6">
+              {intro.definition}
+            </p>
+          </div>
+        </div>
+        <div class="bg-white dark:bg-stone-800 flex flex-col overflow-hidden rounded-md shadow-md xl:flex-row">
+          <div class="flex flex-col justify-center flex-1 p-2 sm:p-6">
+            <h3 class="text-3xl font-bold">
+              Advantages of home based care
+            </h3>
+            <p class="my-6">
+              {intro.advantages}
+            </p>
+          </div>
+          <img src={`${import.meta.env.PUBLIC_CMS}assets/fb23254d-83b9-4b53-8466-fd0f1948eb98`} alt="" class="aspect-video order-first sm:order-last">
+        </div>
+      </div>
+    </section>
+    <div class="px-4 py-16 mx-auto sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8 lg:py-20">
+      <DTitle text="Home Based Care Categories" />
+      <Subtitle text="We have categorized our services into four major categories." />
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {
+          categories.map((category) => (
+            <a href={`/home-based-care/${category.slug}`} class="max-w-xs rounded-md shadow-md relative">
+              <img src={`${import.meta.env.PUBLIC_CMS}assets/${category.caegory_banner.id}?fit=cover&height=450&width=450`} alt={category.category_name} class="object-cover object-center w-full rounded-t-md" />
+              <div class="flex flex-col justify-between p-2 space-y-8">
+                <div class="space-y-2">
+                  <h2 class="font-semibold">
+                    {category.category_name}
+                  </h2>
+                </div>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+    <div class="px-4 py-16 mx-auto sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8 lg:py-20">
+      <DTitle text="Our service timelines" />
+      <Subtitle text="Home based care services are offered during the following timeframes or as per the following special arrangements" />
+      <ul class="grid gap-3 lg:grid-cols-2">
+      {
+        timelines.map((timeline) => (
+          <li class="flex items-center space-x-2 py-4">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-5 h-5 fill-current text-doktarie-blue dark:text-white">
+              <path d="M426.072,86.928A238.75,238.75,0,0,0,88.428,424.572,238.75,238.75,0,0,0,426.072,86.928ZM257.25,462.5c-114,0-206.75-92.748-206.75-206.75S143.248,49,257.25,49,464,141.748,464,255.75,371.252,462.5,257.25,462.5Z"></path>
+              <polygon points="221.27 305.808 147.857 232.396 125.23 255.023 221.27 351.063 388.77 183.564 366.142 160.937 221.27 305.808"></polygon>
+            </svg>
+            <span class="text-black font-semibold dark:text-white">
+              {timeline.description}
+            </span>
+          </li>
+        ))
+      }
+      </ul>
+    </div>
+    <Cta />
+  </div>
+  <Whatsapp client:load />
+</Layout>

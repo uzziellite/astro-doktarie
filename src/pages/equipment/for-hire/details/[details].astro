@@ -1,0 +1,169 @@
+---
+import Layout from "@layouts/layout.astro"
+import Whatsapp from "@components/Whatsapp.vue"
+import {Directus} from "@directus/sdk"
+import DTitle from "@components/DTitle.vue"
+import ProductSearch from "@components/ProductSearch.vue"
+import RelatedProducts from "@components/RelatedProducts.vue"
+import ProductDetails from "@components/ProductDetails.vue"
+
+// src/pages/equipment/for-hire/details/[details].astro
+export async function getStaticPaths() {
+  const data_url = import.meta.env.PUBLIC_CMS
+  const directus = new Directus(data_url)
+  const equipment_data = await directus.items('equipment').readByQuery({
+    filter:{
+      "_and":[
+        {
+          "status":{
+            "_eq":"published"
+          }
+        },
+        {
+          "category":{
+            "type":{
+              "_contains": 'hire'
+            }
+          }
+        },
+        {
+          "type":{
+            "_contains":"hire"
+          }
+        }
+      ]
+    },
+    limit:-1,
+    fields:["slug"]
+  }).catch()
+
+  const equipment = equipment_data.data
+
+  let store = []
+
+  equipment.map((item) => {
+    let data = {}
+    data.params = {}
+    data.params.details = item.slug
+    store.push(data)
+  })
+  
+  return store
+}
+
+const {details} = Astro.params
+const url = import.meta.env.PUBLIC_CMS
+const directus = new Directus(url)
+
+const store_category = await directus.items('equipment_category').readByQuery({
+  filter:{
+    "_and":[
+      {
+        "status":{
+          "_eq":"published"
+        }
+      },
+      {
+        "type":{
+          "_contains":"hire"
+        }
+      }
+    ]
+  },
+  limit:30,
+  sort:"name"
+})
+
+const store_product = await directus.items('equipment').readByQuery({
+  filter:{
+    "_and":[
+      {
+        "status":{
+          "_eq":"published"
+        }
+      },
+      {
+        "slug":{
+          "_eq": details
+        }
+      }
+    ]
+  },
+  fields:['name,slug,description,images.directus_files_id,category.name,category.slug,seo_description'],
+  limit:30,
+  sort:"-date_created"
+})
+
+const related_product = await directus.items('equipment').readByQuery({
+  filter:{
+    "_and":[
+      {
+        "status":{
+          "_eq":"published"
+        }
+      },
+      {
+        "slug":{
+          "_neq": details
+        }
+      },
+      {
+        "category":{
+          "type":{
+            "_contains": 'hire'
+          }
+        }
+      },
+      {
+        "category":{
+          "slug":{
+            "_eq": store_product.data[0].category.slug
+          }
+        }
+      }
+    ]
+  },
+  fields:['name,slug,images.directus_files_id'],
+  limit:6,
+  sort:"-date_created"
+})
+
+const categories = store_category.data
+const products = store_product.data
+const related = related_product.data
+---
+
+<Layout title={products[0].name} description={products[0].seo_description}>
+  <div class="container mx-auto px-2 py-4 mt-16">
+    
+    <DTitle 
+      text="Equipment for hire" 
+    />
+    
+    <h2 class="text-2xl text-stone-800 dark:text-white capitalize font-semibold text-center mt-2 mb-6">
+      {products[0] ? products[0].category.name : ''}
+    </h2>
+    
+    <ProductSearch 
+      client:load 
+      url={url}
+      type='hire'
+    />
+
+    <ProductDetails 
+      client:load
+      url={url}
+      type='hire'
+      products={products}
+      categories={categories}
+    />
+    
+    <RelatedProducts
+      type='hire'
+      url={url}
+      related={related}
+    />
+
+  </div>
+  <Whatsapp client:load />
+</Layout>

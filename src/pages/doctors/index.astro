@@ -1,0 +1,43 @@
+---
+import {Directus} from "@directus/sdk"
+import Layout from "@layouts/layout.astro"
+import DTitle from "@components/DTitle.vue"
+import Subtitle from "@components/Subtitle.vue"
+import IdentifySpecialist from "@components/IdentifySpecialist.vue"
+import Whatsapp from "@components/Whatsapp.vue"
+
+const directus = new Directus(import.meta.env.PUBLIC_CMS)
+
+const counties_data = await directus.items('counties').readByQuery({
+  limit:-1,
+  sort:"name"
+})
+
+const counties = counties_data.data
+
+const specialist_data = await directus.items('specialists').readByQuery({
+  limit:-1,
+  sort:"name"
+})
+
+const specialists = specialist_data.data
+---
+
+<Layout title="Medical Specialists" description="Find a medical doctor from the comfort of your phone">
+  <section class="container mx-auto p-4 mt-16 mb-6">
+    
+    <DTitle text="Find a medical specialist" />
+    
+    <Subtitle text="All field(s) marked with * are required." />
+    
+    <IdentifySpecialist 
+      client:load
+      counties={counties}
+      specialists={specialists}
+    />
+
+  </section>
+
+  <Whatsapp client:load />
+
+</Layout>

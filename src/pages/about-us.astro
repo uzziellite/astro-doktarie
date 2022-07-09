@@ -1,0 +1,162 @@
+---
+import {Directus} from "@directus/sdk"
+import Whatsapp from "@components/Whatsapp.vue"
+import Layout from "@layouts/layout.astro"
+import Intro from "@components/Intro.vue"
+import Cta from "@components/Cta.astro"
+
+const directus = new Directus(import.meta.env.PUBLIC_CMS)
+
+const about_data = await directus.items('about').readByQuery({
+  filter:{
+    "status":{
+      "_eq":"published"
+    }
+  }
+}).catch()
+
+const service_data = await directus.items('services').readByQuery({
+  filter:{
+    "status":{
+      "_eq":"published"
+    }
+  }
+}).catch()
+
+const about = about_data.data
+const services = service_data.data
+---
+
+<Layout title="About Us" description="Doktarie is a web application that strives to bridge the gap between home care service providers and those that need it">
+  <Intro 
+  	background={`${import.meta.env.PUBLIC_CMS}assets/9227eb98-7a3f-4414-9763-70621671b27a`}
+  	title="About Us"
+		description="We endeavour to bring you the best home care services"
+  />
+  <div class="container mx-auto p-4 my-6">
+    <section>
+      <div class="container max-w-xl p-6 py-12 mx-auto space-y-24 lg:px-8 lg:max-w-7xl">
+        <div>
+          <h2 class="text-3xl font-bold tracking-tight text-center sm:text-5xl">
+            Who we are
+          </h2>
+          <p class="max-w-3xl mx-auto mt-4 text-xl lg:text-center">
+            When planning to do business with us, it is important to understand who we are and what we do.
+          </p>
+        </div>
+        <div class="grid lg:gap-8 lg:grid-cols-2 lg:items-center">
+          <div>
+            <h3 class="text-2xl font-bold tracking-tight sm:text-3xl">
+              What is Doktarie?
+            </h3>
+            <p class="mt-3 text-lg">
+              {about.define}
+            </p>
+            <div class="mt-12 space-y-12">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <div class="flex items-center justify-center w-12 h-12 rounded-md bg-doktarie-blue text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-7 h-7">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                  </div>
+                </div>
+                <div class="ml-4">
+                  <h4 class="text-lg font-medium leading-6">
+                    Our Mission
+                  </h4>
+                  <p class="mt-2">
+                    {about.mission}
+                  </p>
+                </div>
+              </div>
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <div class="flex items-center justify-center w-12 h-12 rounded-md bg-doktarie-blue text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-7 h-7">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                  </div>
+                </div>
+                <div class="ml-4">
+                  <h4 class="text-lg font-medium leading-6">
+                    Our Vision
+                  </h4>
+                  <p class="mt-2">
+                    {about.vision}
+                  </p>
+                </div>
+              </div>
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <div class="flex items-center justify-center w-12 h-12 rounded-md bg-doktarie-blue text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-7 h-7">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                  </div>
+                </div>
+                <div class="ml-4">
+                  <h4 class="text-lg font-medium leading-6">
+                    Our Experience
+                  </h4>
+                  <p class="mt-2">
+                    {about.experience}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div aria-hidden="true" class="mt-10 lg:mt-0">
+            <img src={`${import.meta.env.PUBLIC_CMS}assets/17326741-e547-4ff9-9380-8cb4a64a3ac2`} alt="Doctors Possing for a photo" class="mx-auto rounded-lg shadow-lg">
+          </div>
+        </div>
+        <div>
+          <div class="grid lg:gap-8 lg:grid-cols-2 lg:items-center">
+            <div class="lg:col-start-2">
+              <h3 class="text-2xl font-bold tracking-tight sm:text-3xl">
+                What we do
+              </h3>
+              <p class="mt-3 text-lg">
+                {about.who_we_are}
+              </p>
+            </div>
+            <div class="mt-10 lg:mt-0 lg:col-start-1 lg:row-start-1">
+              <img src={`${import.meta.env.PUBLIC_CMS}assets/76885945-51bd-414f-b520-ae637ac91f9d`} alt="Smiling Doctor" class="mx-auto rounded-lg shadow-lg">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section>
+      <div class="container max-w-5xl px-4 py-12 mx-auto">
+        <div class="grid gap-4 mx-4 sm:grid-cols-12">
+          <div class="col-span-12 sm:col-span-3">
+            <div class="text-center sm:text-left mb-14 before:block before:w-24 before:h-3 before:mb-5 before:rounded-md before:mx-auto sm:before:mx-0 before:bg-doktarie-blue">
+              <h3 class="text-3xl font-semibold">
+                Services Offered
+              </h3>
+            </div>
+          </div>
+          <div class="relative col-span-12 sm:px-4 space-y-6 sm:col-span-9">
+            <div class="col-span-12 space-y-12 relative sm:px-4 sm:col-span-8 sm:space-y-8 sm:before:absolute sm:before:top-2 sm:before:bottom-0 sm:before:w-0.5 sm:before:-left-3 before:dark:bg-coolGray-700">
+              {
+                services.map((service) => (
+                  <div class="flex flex-col relative before:absolute before:top-2 before:w-4 before:h-4 before:rounded-full before:left-[-35px] before:z-[1] before:bg-doktarie-blue">
+                    <h3 class="text-lg font-semibold tracking-wide">
+                      {service.service_name}
+                    </h3>
+                    <p class="mt-3 text-sm">
+                      {service.service_description}
+                    </p>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <Cta />
+  </div>
+  <Whatsapp client:load />
+</Layout>

@@ -1,0 +1,298 @@
+---
+import {Directus} from "@directus/sdk"
+import Whatsapp from "@components/Whatsapp.vue"
+import Layout from "@layouts/layout.astro"
+import DTitle from "@components/DTitle.vue"
+import Subtitle from "@components/Subtitle.vue"
+import Carousel from "@components/Carousel.vue"
+import DCardicon from "@components/DCardicon.vue"
+import DCardImage from "@components/DCardImage.vue"
+import AppointmentForm from "@components/AppointmentForm.vue"
+import TestimonialVideos from "@components/TestimonialVideos.vue"
+import TopSpecialists from "@components/TopSpecialists.vue"
+
+const directus = new Directus(import.meta.env.PUBLIC_CMS)
+
+const blog_data = await directus.items('blog').readByQuery({
+  filter:{
+    "_and":[
+      {
+        "status":{
+          "_eq":"published"
+        }
+      },
+      {
+        "category":{
+          "_contains":"blog"
+        }
+      }
+    ]
+  },
+  limit:3,
+  sort:"-date_created"
+}).catch()
+
+const blogs = blog_data.data
+
+const testimonials_data = await directus.items('testimonials').readByQuery({
+  filter:{
+    "status":{
+      "_eq":"published"
+    }
+  },
+  limit:2,
+  sort:"-date_created"
+}).catch()
+
+const testimonies = testimonials_data.data
+
+const top_specialists_data = await directus.items('top_specialists').readByQuery({
+  filter:{
+    "status":{
+      "_eq":"published"
+    }
+  },
+  limit:10,
+  sort:"-date_created",
+  fields:['slug,specialist.*']
+}).catch()
+
+const top_specialists = top_specialists_data.data
+
+const payment_instructions = await directus.items('payment_instructions').readByQuery({
+  filter:{
+    "status":{
+      "_eq":"published"
+    }
+  }
+}).catch()
+
+const payment_details = payment_instructions.data
+
+const payment_methods_data = await directus.items('payment_methods').readByQuery({
+  limit:-1
+}).catch()
+
+const payment_methods = payment_methods_data.data
+
+const testimonial_videos_data = await directus.items('testimonial_videos').readByQuery({
+  filter:{
+    "status":{
+      "_eq":"published"
+    }
+  },
+  limit:3,
+  sort:"-date_created"
+}).catch()
+
+const testimonial_videos = testimonial_videos_data.data
+
+const setExcerpt = (text) => {
+  return `${text.slice(0,128)} [&hellip;]`
+}
+---
+
+<Layout title="Doktarie - Your Home based care partner" description="Doktarie is a home-based care platform. We have specialists that provide proper homecare for individuals who need it the most. We offer professional home based care services">
+  <Carousel client:load />
+  <div class="container relative mx-auto">
+    <div class="grid place-items-center gap-4 mt-2">
+      <div class="px-4 col-span-3">
+        <div class="md:pr-12 mt-6">
+          <DTitle text="Time to care for your health" />
+          <Subtitle text="Let professional healthcare workers take care of you right from the comfort of your home" />
+          <div class="grid lg:grid-cols-2 gap-x-8 gap-y-4">
+            <div class="flex space-x-3 w-full">
+              <svg class="w-8 h-8 text-doktarie-blue dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+              <div class="flex flex-col space-y-2 w-full">
+                <a href="#form" class="font-semibold text-xl text-2xl">
+                  Make an Appointment
+                </a>
+                <p class="text-lg">
+                  Book an appointment with a doctor by filling an online form
+                </p>
+              </div>
+            </div>
+            <div class="flex space-x-3 w-full">
+              <svg class="w-8 h-8 text-doktarie-blue dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+              <div class="flex flex-col space-y-2 w-full">
+                <h3 class="font-semibold text-xl text-2xl">
+                  Health Guarantee
+                </h3>
+                <p class="text-lg">
+                  We have highly skilled health care workers who can handle various situations from nutritional needs to specialized care
+                </p>
+              </div>
+            </div>
+            <div class="flex space-x-3 w-full">
+              <svg class="w-8 h-8 text-doktarie-blue dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <div class="flex flex-col space-y-2 w-full">
+                <h3 class="font-semibold text-xl text-2xl">
+                  Client Satisfaction
+                </h3>
+                <p class="text-lg">
+                  We endeavour to provide the best services to all our customers
+                </p>
+              </div>
+            </div>
+            <div class="flex space-x-3 w-full">
+              <svg class="w-8 h-8 text-doktarie-blue dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+              <div class="flex flex-col space-y-2 w-full">
+                <h3 class="font-semibold text-xl text-2xl">
+                  Spread in various places
+                </h3>
+                <p class="text-lg">
+                  Our home care professionals come where you are to serve you or your loved ones
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container mx-auto p-4 mt-6">
+  	<DTitle text="services" />
+    <Subtitle text="We offer the following services" />
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2">
+    	<DCardicon title="Home based care" text="Our personalized home care services offers unique benefits and peace of mind for you and your loved ones">
+    		<svg class="h-12 w-12" width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M13.0193 11.9846C13.0768 11.2752 13.2616 10.6012 13.5512 9.98462H6V12.4662L10 15.4969V42.0154H38V15.5321L42.5 12.5014V9.98462H24.4488C24.7384 10.6012 24.9232 11.2752 24.9807 11.9846H39.687L36 14.4678V40.0154H12V14.5031L8.67616 11.9846H13.0193Z" fill="#ffffff"/><path fill-rule="evenodd" clip-rule="evenodd" d="M20 26H16V30H20V26ZM14 24V32H22V24H14Z" fill="#ffffff"/><path fill-rule="evenodd" clip-rule="evenodd" d="M32 26H26V40H32V26ZM24 24V42H34V24H24Z" fill="#ffffff"/><path d="M6 41C6 41.5523 6.44772 42 7 42H41C41.5523 42 42 41.5523 42 41C42 40.4477 41.5523 40 41 40H7C6.44772 40 6 40.4477 6 41Z" fill="#ffffff"/><path fill-rule="evenodd" clip-rule="evenodd" d="M15 16H10V14H15V16Z" fill="#ffffff"/><path fill-rule="evenodd" clip-rule="evenodd" d="M37.5 16H23V14H37.5V16Z" fill="#ffffff"/><path fill-rule="evenodd" clip-rule="evenodd" d="M25 12C25 15.3137 22.3137 18 19 18C15.6863 18 13 15.3137 13 12C13 8.68629 15.6863 6 19 6C22.3137 6 25 8.68629 25 12ZM20 9V11H22V13H20V15H18V13H16V11H18V9H20Z" fill="#ffffff"/></svg>
+    	</DCardicon>
+    	<DCardicon title="Therapy" text="We offer the best therapy services to clients all over Kenya from the comfort of their homes">
+    		<svg class="h-12 w-12" width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M39 8H9C8.44771 8 8 8.44772 8 9V39C8 39.5523 8.44772 40 9 40H39C39.5523 40 40 39.5523 40 39V9C40 8.44771 39.5523 8 39 8ZM9 6C7.34315 6 6 7.34315 6 9V39C6 40.6569 7.34315 42 9 42H39C40.6569 42 42 40.6569 42 39V9C42 7.34315 40.6569 6 39 6H9Z" fill="#ffffff"/><path fill-rule="evenodd" clip-rule="evenodd" d="M31.4765 13.7461C31.4765 15.815 29.7994 17.4922 27.7304 17.4922C25.6615 17.4922 23.9844 15.815 23.9844 13.7461C23.9844 11.6772 25.6615 10 27.7304 10C29.7994 10 31.4765 11.6772 31.4765 13.7461ZM14 30H19.828L24.222 34.3356L26.2879 39.0997C26.7274 40.1131 27.9052 40.5783 28.9185 40.1389C29.9319 39.6994 30.3972 38.5216 29.9577 37.5083L27.7375 32.3885C27.6357 32.1536 27.4896 31.9405 27.3074 31.7606L25.523 30H34C35.1046 30 36 30.8954 36 32V40H38V32C38 29.7909 36.2091 28 34 28H30.8725C31.7344 27.794 32.3842 27.0286 32.4056 26.1009C32.4312 24.9967 31.5568 24.0807 30.4525 24.0551C28.6983 24.0145 28.1719 23.7225 27.7954 23.3836C27.5416 23.1551 27.2589 22.8076 26.8671 22.2061C26.5854 21.7736 26.2951 21.2871 25.9387 20.69L25.9385 20.6896L25.9383 20.6893C25.7874 20.4364 25.6246 20.1637 25.4457 19.8668L25.4032 19.7962C25.2794 19.59 25.1186 19.3222 24.9572 19.1048C24.7624 18.8423 24.4007 18.4146 23.7948 18.1625C23.186 17.9091 22.6214 17.9531 22.2724 18.0079C21.9411 18.0599 21.5836 18.1618 21.2917 18.2456L21.2917 18.2456C20.4238 18.4948 19.701 19.154 19.2274 19.669C18.6829 20.2611 18.1547 21.0107 17.7273 21.8378C16.922 23.3961 16.2217 25.7508 17.214 27.9481C17.2219 27.9656 17.23 27.9829 17.2383 28H14C11.7909 28 10 29.7909 10 32V40H12V32C12 30.8954 12.8954 30 14 30ZM29.3301 28H23.4961L22.5404 27.0569L24.0533 25.1658C24.3712 25.5922 24.7195 25.9967 25.1195 26.3567C26.2938 27.4136 27.6485 27.8544 29.3301 28ZM16.8723 30.0868L20.1482 33.2289L19.3193 36.0258C19.2687 36.1969 19.1953 36.3604 19.1013 36.5119L17.3354 39.3582C16.753 40.2968 15.5201 40.5856 14.5815 40.0033C13.6429 39.421 13.3541 38.188 13.9364 37.2494L15.5606 34.6316L16.6637 30.9091L16.8723 30.0868Z" fill="#ffffff"/></svg>
+    	</DCardicon>
+    	<DCardicon title="Diet Planning and Nutrition" text="Plan your specialized diet with the help of our dieticians">
+    		<svg class="w-12 h-12" width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M5.02711 12.004C5.17722 14.6951 5.94316 16.361 7.06486 17.3876C6.51718 17.7955 6.19966 18.4802 6.31624 19.2205C6.8886 22.8551 8.31955 30.5431 11.2529 39.209C11.8359 40.9314 14.1644 40.9314 14.7474 39.209C17.6807 30.5431 19.1117 22.8551 19.6841 19.2205C19.8006 18.4802 19.4831 17.7955 18.9354 17.3875C20.0571 16.361 20.823 14.6951 20.9731 12.004C21.0039 11.4526 20.5509 10.9984 19.9987 11.0063C18.3706 11.0297 17.0775 11.1286 16.0687 11.4677C15.6523 10.3693 14.8116 9.33226 13.5464 8.38556C13.2232 8.1437 12.777 8.1437 12.4538 8.38556C11.1989 9.32457 10.3615 10.3524 9.94171 11.4409C8.96207 11.152 7.67924 11.0374 6.00412 11.0081C5.45192 10.9984 4.99635 11.4526 5.02711 12.004ZM14.881 13.9769L14.1986 12.1766C14.0096 11.6782 13.6403 11.1177 13.0001 10.5265C12.3666 11.1115 11.9984 11.6664 11.8077 12.1607L11.1443 13.8807L9.37596 13.3592C8.85431 13.2054 8.14201 13.1027 7.14128 13.048C7.43859 14.9761 8.15323 15.791 8.80471 16.2124C9.73623 16.8148 11.0935 16.9981 12.9702 17H13.03C14.9068 16.9981 16.264 16.8148 17.1955 16.2124C17.8476 15.7906 18.563 14.9746 18.8598 13.0425C17.89 13.0933 17.2092 13.1943 16.706 13.3634L14.881 13.9769ZM8.30621 19H17.6941C17.4076 20.8074 16.9102 23.5992 16.1243 27H12V29H15.645C14.9543 31.7823 14.0845 34.8825 13.0001 38.13C12.6459 37.069 12.3145 36.0236 12.0048 35H13V33H11.4186C10.4611 29.626 9.74472 26.548 9.22106 24H12L12 22H8.82746C8.60639 20.8238 8.43498 19.8125 8.30621 19Z" fill="#ffffff"/><path d="M38.2425 28.0298C38.7783 28.1638 39.1041 28.7067 38.9701 29.2425C38.3806 31.6008 36.6008 33.3805 34.2425 33.9701C33.7067 34.1041 33.1638 33.7783 33.0299 33.2425C32.8959 32.7067 33.2217 32.1638 33.7575 32.0298C35.3992 31.6194 36.6194 30.3991 37.0299 28.7574C37.1638 28.2216 37.7067 27.8959 38.2425 28.0298Z" fill="#ffffff"/><path fill-rule="evenodd" clip-rule="evenodd" d="M32.6508 21.0274C31.542 18.4345 31.7342 15.68 33.7071 13.7071L32.2929 12.2929C29.9635 14.6222 29.559 17.6703 30.3403 20.4708C25.7646 18.4006 21 22.2077 21 28C21 33.5228 25.9249 38 32 38C38.0751 38 43 33.5228 43 28C43 21.7798 37.5055 17.849 32.6508 21.0274ZM32 24.0612L30.7506 23.0617C28.8927 21.5753 27.0622 21.6579 25.676 22.5141C24.2104 23.4193 23 25.3575 23 28C23 32.2431 26.8458 36 32 36C37.1542 36 41 32.2431 41 28C41 25.3575 39.7896 23.4193 38.324 22.5141C36.9378 21.6579 35.1073 21.5753 33.2494 23.0617L32 24.0612Z" fill="#ffffff"/><path d="M34 18C37 18 39 16 39 13C36 13 34 15 34 18Z" fill="#ffffff"/></svg>
+    	</DCardicon>
+    	<DCardicon title="Counselling" text="We provide professional counselling services to individual patients, families or groups">
+    		<svg class="w-12 h-12" width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M42 17C42 20.1693 39.5427 22.7647 36.4295 22.9849L33.3787 26.0356C34.2339 27.4815 34.6184 29.4018 34.8077 31.537C35 33.7058 35 36.2422 35 38.9655V40H33V39C33 36.2364 32.9992 33.785 32.8155 31.7137C32.6547 29.9002 32.3606 28.4865 31.8732 27.4611C30.6758 27.301 29.5837 26.6985 28.6469 25.9568C27.5427 25.0827 26.5611 23.9424 25.753 22.842C24.9408 21.736 24.2788 20.6358 23.821 19.8153C23.7595 19.7052 23.7016 19.5999 23.6475 19.5001C22.3043 20.43 20.4929 21 18.5 21C14.3579 21 11 18.5376 11 15.5C11 12.7074 13.8381 10.4009 17.5146 10.047C18.7975 7.69212 22.3359 6 26.5 6C31.208 6 35.1161 8.163 35.869 11.0014C35.9126 11.0005 35.9562 11 36 11C39.3137 11 42 13.6863 42 17ZM30.027 17.5729C28.9365 17.8484 27.7463 18 26.5 18C26.0657 18 25.6382 17.9816 25.2194 17.946C25.1949 17.9821 25.1698 18.018 25.1443 18.0537C25.2521 18.2624 25.3943 18.5305 25.5675 18.8408C25.999 19.6141 26.6165 20.6389 27.365 21.6582C27.4018 21.7083 27.4389 21.7583 27.4762 21.8082L27.4761 21.6621C28.5812 21.6612 29.7407 21.0648 30.7032 20.3544C30.7769 20.3 30.8487 20.2456 30.9182 20.1914C30.4324 19.4193 30.1175 18.5288 30.027 17.5729ZM32.2527 21.6862C32.7571 22.09 33.3281 22.4141 33.9465 22.6394L31.3278 25.2581C30.8625 25.0711 30.3812 24.779 29.8882 24.3887C29.5459 24.1177 29.2106 23.8092 28.8853 23.4752C30.0685 23.1688 31.1152 22.5362 31.8909 21.9636C32.0168 21.8706 32.1376 21.7778 32.2527 21.6862Z" fill="#ffffff"/><path d="M15.5041 28.0023C16.8848 28.0012 18.0032 26.881 18.002 25.5003C18.0009 24.1196 16.8807 23.0012 15.5 23.0023C14.1193 23.0035 13.0009 24.1237 13.002 25.5044C13.0032 26.8851 14.1234 28.0035 15.5041 28.0023Z" fill="#ffffff"/><path d="M8.50409 32.0023C9.88481 32.0012 11.0032 30.881 11.002 29.5003C11.0009 28.1196 9.88071 27.0012 8.5 27.0023C7.11929 27.0035 6.00092 28.1237 6.00205 29.5044C6.00318 30.8851 7.12338 32.0035 8.50409 32.0023Z" fill="#ffffff"/><path d="M28.002 29.5001C28.0032 30.8808 26.8848 32.001 25.5041 32.0021C24.1234 32.0032 23.0032 30.8849 23.002 29.5042C23.0009 28.1234 24.1193 27.0032 25.5 27.0021C26.8807 27.001 28.0009 28.1193 28.002 29.5001Z" fill="#ffffff"/><path d="M15 29C16.1046 29 17 29.8954 17 31V33H19C20.1046 33 21 33.8954 21 35C21 36.1046 20.1046 37 19 37H15C13.8954 37 13 36.1046 13 35V31C13 29.8954 13.8954 29 15 29Z" fill="#ffffff"/><path d="M10 35C10 33.8954 9.10457 33 8 33C6.89543 33 6 33.8954 6 35V40C6 41.1046 6.89543 42 8 42H12C13.1046 42 14 41.1046 14 40C14 38.8954 13.1046 38 12 38H10V35Z" fill="#ffffff"/><path d="M26 33C24.8954 33 24 33.8954 24 35V38H22C20.8954 38 20 38.8954 20 40C20 41.1046 20.8954 42 22 42H26C27.1046 42 28 41.1046 28 40V35C28 33.8954 27.1046 33 26 33Z" fill="#ffffff"/></svg>
+    	</DCardicon>
+    </div>
+  </div>
+  <div class="container mx-auto p-4 mt-6">
+    <DTitle text="get started" />
+    <Subtitle text="Let our qualified doctors meet and treat you from the comfort of your home. You can also book home based care services by applying on the online form" />
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+      <DCardImage title="Fill the consultancy form" image={`${import.meta.env.PUBLIC_CMS}assets/503474a3-6c9c-42f6-8dd4-927d11538d9c`}>
+      	<a href="#form" class="underline">
+      		Fill form
+      	</a>
+      </DCardImage>
+      <DCardImage 
+      	title="Our doctor makes contact"
+      	image={`${import.meta.env.PUBLIC_CMS}assets/689af57b-3318-43f1-b0b0-94bfa7e69aea`}
+      />
+      <DCardImage 
+      	title="The doctor examines and makes a dignosis from your location"
+      	image={`${import.meta.env.PUBLIC_CMS}assets/30b25a61-0991-4576-8907-30b9f7ef9c05`}
+      />
+      <DCardImage 
+      	title="Drugs are prescribed and delivered"
+      	image={`${import.meta.env.PUBLIC_CMS}assets/cc3d079f-787f-4447-9c14-983b333a43c7`}
+      />
+    </div>
+  </div>
+  <div id="form">
+    <div class="container mx-auto p-4">
+      <div class="grid lg:grid-cols-6 bg-blue-200 dark:bg-transparent rounded-lg shadow-md">
+        <div class="lg:col-span-3 relative p-2">
+          <h2 class="font-extrabold text-doktarie-blue dark:text-white text-2xl md:text-3xl lg:text-4xl uppercase my-6">
+            Booking Guidelines
+          </h2>
+          <p class="my-3">
+            {payment_details.instruction}
+          </p>
+          <a href="/faqs" class="font-semibold mt-5 mb-8 group text-doktarie-blue dark:text-white">
+            Frequently Asked Questions
+            <svg xmlns="http://www.w3.org/2000/svg" class="inline-block h-6 w-6 group-hover:translate-x-2 transition delay-100 transition-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+          </a>
+          <div class="grid grid-cols-2 gap-2 my-2">
+            {
+              payment_methods.map((payment) => (
+                <div class="grid gap-2 bg-white dark:bg-stone-800 rounded-md shadow-md p-2">
+                  <img src={`${import.meta.env.PUBLIC_CMS}assets/${payment.banner}`} class="w-full object-cover" />
+                  <div class="prose prose-sm dark:prose-invert" set:html="payment.payment_accounts"></div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+        <div class="lg:col-span-3 relative p-2">
+          <AppointmentForm 
+            client:load
+            url={import.meta.env.PUBLIC_CMS}
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container mx-auto p-4 mt-6">
+    <DTitle text="medical news and events" />
+    <Subtitle text="Stay informed on the latest developments in the medical world. Get informed about the latest information on nutrition, diseases, healthy lifestyles and so much more" />
+    <div class="grid lg:grid-cols-3 md:grid-cols-2 gap-6 mt-6">
+      {
+        blogs.map((item) => (
+        	<a href={`/blog/${item.slug}`} class="bg-gray-100 dark:bg-stone-800 rounded-xl shadow-md cursor-pointer">
+            <figure>
+              <img class="w-full rounded-tr-xl rounded-tl-xl" src={`${import.meta.env.PUBLIC_CMS}assets/${item.featured_image}?fit=cover&height=250&width=400`} alt={item.blog_title} />
+              <div class="px-2">
+                <h2 class="font-black pb-2 text-lg">
+                  {item.blog_title}
+                </h2>
+                <figcaption class="font-medium font-serif">
+                  <div class="text-lg" set:html={setExcerpt(item.blog_content)}></div>
+                </figcaption>
+              </div>
+            </figure>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+  <section>
+    <div class="container px-5 py-24 mx-auto">
+      <DTitle text="Testimonials" />
+      <Subtitle text="Find out more about what our customers have to say about our services" />
+      <div class="flex flex-wrap -m-4">
+        {
+          testimonies.map((item) => (
+            <div class="p-4 md:w-1/2 w-full">
+              <div class="h-full bg-white dark:bg-stone-800 p-8 rounded-lg shadow-md">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="block w-5 h-5 mb-4" viewBox="0 0 975.036 975.036">
+                  <path d="M925.036 57.197h-304c-27.6 0-50 22.4-50 50v304c0 27.601 22.4 50 50 50h145.5c-1.9 79.601-20.4 143.3-55.4 191.2-27.6 37.8-69.399 69.1-125.3 93.8-25.7 11.3-36.8 41.7-24.8 67.101l36 76c11.6 24.399 40.3 35.1 65.1 24.399 66.2-28.6 122.101-64.8 167.7-108.8 55.601-53.7 93.7-114.3 114.3-181.9 20.601-67.6 30.9-159.8 30.9-276.8v-239c0-27.599-22.401-50-50-50zM106.036 913.497c65.4-28.5 121-64.699 166.9-108.6 56.1-53.7 94.4-114.1 115-181.2 20.6-67.1 30.899-159.6 30.899-277.5v-239c0-27.6-22.399-50-50-50h-304c-27.6 0-50 22.4-50 50v304c0 27.601 22.4 50 50 50h145.5c-1.9 79.601-20.4 143.3-55.4 191.2-27.6 37.8-69.4 69.1-125.3 93.8-25.7 11.3-36.8 41.7-24.8 67.101l35.9 75.8c11.601 24.399 40.501 35.2 65.301 24.399z"></path>
+                </svg>
+                <p class="leading-relaxed mb-6">
+                  {item.testimony}
+                </p>
+                <a class="inline-flex items-center">
+                  <img alt="testimonial" src={`${import.meta.env.PUBLIC_CMS}assets/${item.avatar}`} class="w-12 h-12 rounded-full flex-shrink-0 object-cover object-center" />
+                  <span class="flex-grow flex flex-col pl-4">
+                    <span class="title-font font-medium">
+                      {item.name}
+                    </span>
+                    <span class="text-sm">
+                      {item.role}
+                    </span>
+                  </span>
+                </a>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+      <TestimonialVideos 
+        url={import.meta.env.PUBLIC_CMS}
+        testimonial_videos={testimonial_videos} 
+      />
+    </div>
+  </section>
+  <div class="container mx-auto p-4 mt-3">
+    <DTitle text="Top Medical specialists" />
+    <Subtitle text="Here are some of the top rated medical practitioners" />
+    <TopSpecialists 
+      client:load
+      top_specialists={top_specialists}
+      url={import.meta.env.PUBLIC_CMS}
+    />
+  </div>
+  <Whatsapp client:load />
+</Layout>

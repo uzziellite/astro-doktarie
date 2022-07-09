@@ -1,0 +1,49 @@
+---
+import {Directus} from "@directus/sdk"
+import Whatsapp from "@components/Whatsapp.vue"
+import Layout from "@layouts/layout.astro"
+import Intro from "@components/Intro.vue"
+import DTitle from "@components/DTitle.vue"
+
+const directus = new Directus(import.meta.env.PUBLIC_CMS)
+
+const faqs_data = await directus.items('faqs').readByQuery({
+	filter:{
+		"status":{
+			"_eq":"published"
+		}
+	}
+}).catch()
+
+const faqs = faqs_data.data
+---
+
+<Layout title="Frequently asked questions" description="Get all your questions about our services answered. Learn how we do business with our customers">
+	<Intro 
+		title="Frequently asked questions"
+		description="We endeavour to answer all the questions that you might have about our services"
+		background={`${import.meta.env.PUBLIC_CMS}assets/17326741-e547-4ff9-9380-8cb4a64a3ac2`}
+	/>
+	<section>
+		<div class="container flex flex-col justify-center p-4 mx-auto md:p-8">
+			<DTitle text="Frequent asked questions" />
+			<div class="flex flex-col divide-y sm:px-8 lg:px-12 xl:px-32 divide-stone-700">
+				{
+					faqs.map((faq) => (
+						<details>
+							<summary class="py-2 outline-none cursor-pointer text-lg uppercase">
+								{faq.question}
+							</summary>
+							<div class="px-4 pb-4">
+								<p>
+									{faq.answer}
+								</p>
+							</div>
+						</details>
+					))
+				}
+			</div>
+		</div>
+	</section>
+	<Whatsapp client:load />
+</Layout>
